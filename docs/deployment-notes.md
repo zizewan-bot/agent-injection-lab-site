@@ -42,6 +42,13 @@ Not deployed yet.
 
 ## Phase 0.1 Backend Status
 
-Not implemented yet.
+Backend foundation is present, but live submission requires Cloudflare D1 setup before it is active.
 
-The static Evidence Gallery currently uses sample anonymized observations. Live submissions are not enabled yet. No data is collected by the site in the current static preview.
+Required setup:
+
+1. Create the D1 database named `agent_injection_lab_observations`.
+2. Replace `TODO_D1_DATABASE_ID` in `wrangler.jsonc` with the real D1 database id.
+3. Apply `migrations/0001_create_observations.sql`.
+4. Deploy with Wrangler after build and migration verification.
+
+The Evidence Gallery falls back to sample anonymized observations when the API or D1 binding is unavailable. No full evidence upload is accepted. Gallery data reads only sanitized observations where `moderation_status` is `visible`.

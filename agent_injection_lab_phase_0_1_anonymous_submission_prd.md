@@ -8,6 +8,8 @@ Phase 0.1 — Opt-in Anonymous Result Submission
 
 Planning / PRD only. Do not implement code from this document until the Phase 0.1 implementation task is explicitly approved.
 
+Implementation note: Batch A site-side backend foundation is implemented in the Personal Landing Page repository. Live submission still requires Cloudflare D1 database setup, replacing the `TODO_D1_DATABASE_ID` placeholder, applying the D1 migration, and deploying the Worker.
+
 ## Summary
 
 Agent Injection Lab Phase 0 v0.1.0 produces local-only results through `report.html` and `summary.json`. Phase 0.1 adds an explicit, user-initiated path for submitting an anonymized summary observation to a public Evidence Gallery.

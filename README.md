@@ -14,18 +14,27 @@ This repository contains the static public preview website that supports transpa
 
 ## Current Preview Status
 
-This is a static public preview site. The static Evidence Gallery currently uses sample anonymized observations only.
+This is a public preview site. Phase 0.1 backend code is present, but live submissions require Cloudflare D1 setup before they are active.
 
-Live submissions are not enabled yet. No data is collected by the site in the current static preview.
+Until the `DB` D1 binding is configured and deployed, the Evidence Gallery uses sample anonymized observations as a fallback. No full evidence upload is accepted.
 
 ## Not Implemented Yet
 
-- live submission endpoint
-- database
-- live gallery aggregation
 - upload flow
 - accounts
 - analytics
+
+## Phase 0.1 Backend Foundation
+
+The repository includes:
+
+- strict anonymized summary validator
+- `POST /api/agent-injection-lab/submissions`
+- `GET /api/agent-injection-lab/observations`
+- `GET /api/agent-injection-lab/observations/:submission_id`
+- D1 migration for sanitized observations
+
+Live submission is only active after the D1 database is created, the `database_id` placeholder in `wrangler.jsonc` is replaced, and the migration is applied. The gallery only reads sanitized visible observations.
 
 ## Related Repository
 

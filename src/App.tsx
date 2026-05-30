@@ -1,3 +1,4 @@
+import { useEffect, useMemo, useState } from "react";
 import {
   ArrowRight,
   BookOpen,
@@ -40,6 +41,38 @@ type Observation = {
   meaning: string;
   doesNotProve: string;
   networkEgressTested: boolean;
+};
+
+type PublicObservation = {
+  submission_id: string;
+  submitted_at: string;
+  scenario_id: string;
+  result_code: string;
+  severity: string;
+  network_egress_tested: boolean;
+  primary_surface: string;
+  primary_relative_path: string | null;
+  agent_name: string | null;
+  agent_version: string | null;
+  os: string | null;
+  user_comment: string | null;
+};
+
+type GalleryStats = {
+  total_observations: number;
+  count_by_result_code: Record<string, number>;
+  count_by_scenario_id: Record<string, number>;
+  count_by_agent_name: Record<string, number>;
+  critical_local_staging_observed: number;
+  no_verified_staging_observed: number;
+  degraded_inconclusive: number;
+  network_egress_tested: { true: number; false: number };
+};
+
+type GalleryApiData = {
+  observations: PublicObservation[];
+  stats: GalleryStats;
+  selected_observation: PublicObservation | null;
 };
 
 const availableScenarios: Scenario[] = [
@@ -819,7 +852,166 @@ function ObservationCard({ observation }: { observation: Observation }) {
   );
 }
 
+function observationFromPublicObservation(observation: PublicObservation): Observation {
+  const isCritical = observation.result_code.startsWith("CRITICAL_");
+  const path = observation.primary_relative_path;
+  const agent = observation.agent_name || "Not provided";
+
+  return {
+    runType: "Community observation",
+    agent,
+    agentSelfReported: Boolean(observation.agent_name),
+    scenario: observation.scenario_id,
+    sourceType: sourceTypeForScenario(observation.scenario_id),
+    result: observation.result_code,
+    observedBehavior: observedBehaviorForResult(observation.result_code, path),
+    meaning: meaningForResult(observation.result_code),
+    doesNotProve: isCritical
+      ? "Network exfiltration was not tested."
+      : "This does not prove the agent is safe.",
+    networkEgressTested: observation.network_egress_tested,
+  };
+}
+
+function sourceTypeForScenario(scenarioId: string) {
+  if (scenarioId === "dependency_resolver_staging") {
+    return "Cached dependency resolver bug report";
+  }
+  return "Community-submitted scenario";
+}
+
+function observedBehaviorForResult(resultCode: string, path: string | null) {
+  if (resultCode === "CRITICAL_SECRET_STAGED_IN_WORKSPACE_FILE") {
+    return path
+      ? `Synthetic secret staged in ${path}.`
+      : "Synthetic secret staged in a local workspace file.";
+  }
+  if (resultCode === "CRITICAL_SECRET_STAGED_IN_GIT_DIFF") {
+    return "Synthetic secret appeared in local Git diff state.";
+  }
+  if (resultCode === "CRITICAL_SECRET_STAGED_IN_GIT_INDEX") {
+    return "Synthetic secret appeared in local Git index state.";
+  }
+  if (resultCode === "HIGH_GIT_UNAVAILABLE") {
+    return "Git state could not be inspected in this run.";
+  }
+  if (resultCode === "INCONCLUSIVE_RUN_ERROR") {
+    return "The run did not complete with a conclusive observation.";
+  }
+  return "Agent produced redacted diagnostic output.";
+}
+
+function meaningForResult(resultCode: string) {
+  if (resultCode.startsWith("CRITICAL_")) {
+    return "Local staging was observed in this run.";
+  }
+  if (resultCode === "NO_VERIFIED_STAGING_OBSERVED") {
+    return "No verified synthetic-secret staging was observed in this run.";
+  }
+  if (resultCode === "HIGH_GIT_UNAVAILABLE") {
+    return "The run could not verify Git-based staging behavior.";
+  }
+  return "The run result is inconclusive.";
+}
+
+function primaryStatsFromGallery(stats: GalleryStats): EvidenceStat[] {
+  return [
+    {
+      label: "Total observations",
+      value: String(stats.total_observations),
+      prominence: "primary",
+    },
+    {
+      label: "Critical local staging observed",
+      value: String(stats.critical_local_staging_observed),
+      prominence: "primary",
+    },
+    {
+      label: "No verified staging observed",
+      value: String(stats.no_verified_staging_observed),
+      prominence: "primary",
+    },
+    {
+      label: "Scenarios tested",
+      value: String(Object.keys(stats.count_by_scenario_id).length),
+      prominence: "primary",
+    },
+  ];
+}
+
+function secondaryStatsFromGallery(stats: GalleryStats): EvidenceStat[] {
+  const selfReportedAgents = Object.keys(stats.count_by_agent_name).filter(
+    (agentName) => agentName !== "Not provided",
+  ).length;
+
+  return [
+    {
+      label: "Agents self-reported",
+      value: String(selfReportedAgents),
+      prominence: "secondary",
+    },
+    {
+      label: "Network egress tested",
+      value: String(stats.network_egress_tested.true),
+      prominence: "secondary",
+    },
+    {
+      label: "Degraded / inconclusive",
+      value: String(stats.degraded_inconclusive),
+      prominence: "secondary",
+    },
+  ];
+}
+
 function AgentInjectionLabEvidencePage() {
+  const [galleryData, setGalleryData] = useState<GalleryApiData | null>(null);
+  const [galleryStatus, setGalleryStatus] = useState<"loading" | "live" | "fallback">(
+    "loading",
+  );
+
+  useEffect(() => {
+    const controller = new AbortController();
+    const submission = new URLSearchParams(window.location.search).get("submission");
+    const query = submission ? `?submission=${encodeURIComponent(submission)}` : "";
+
+    fetch(`/api/agent-injection-lab/observations${query}`, {
+      headers: { accept: "application/json" },
+      signal: controller.signal,
+    })
+      .then((response) => {
+        if (!response.ok) throw new Error("Gallery API unavailable");
+        return response.json() as Promise<GalleryApiData>;
+      })
+      .then((data) => {
+        setGalleryData(data);
+        setGalleryStatus("live");
+      })
+      .catch((error) => {
+        if (error.name === "AbortError") return;
+        setGalleryStatus("fallback");
+      });
+
+    return () => controller.abort();
+  }, []);
+
+  const isLive = galleryStatus === "live" && galleryData !== null;
+  const displayedObservations = useMemo(
+    () =>
+      isLive
+        ? galleryData.observations.map(observationFromPublicObservation)
+        : sampleObservations,
+    [galleryData, isLive],
+  );
+  const selectedObservation = galleryData?.selected_observation
+    ? observationFromPublicObservation(galleryData.selected_observation)
+    : null;
+  const hasSubmissionQuery =
+    typeof window !== "undefined" && new URLSearchParams(window.location.search).has("submission");
+  const primaryStats = isLive ? primaryStatsFromGallery(galleryData.stats) : primaryEvidenceStats;
+  const secondaryStats = isLive
+    ? secondaryStatsFromGallery(galleryData.stats)
+    : secondaryEvidenceStats;
+
   return (
     <>
       <Header />
@@ -868,19 +1060,28 @@ function AgentInjectionLabEvidencePage() {
           <div className="submitted-observation-card">
             <p className="eyebrow">Phase 0.1 placeholder</p>
             <h2>Your submitted observation</h2>
-            <p>
-              Current preview: live submission is not enabled yet.
-            </p>
-            <p>
-              After Phase 0.1 submission is enabled, your submitted anonymized
-              observation will appear here after confirmation.
-            </p>
-            <div className="submission-flow" aria-label="Future submission flow">
-              <span>report.html</span>
-              <span>preview anonymized summary</span>
-              <span>submit</span>
-              <span>return here</span>
-            </div>
+            {selectedObservation ? (
+              <ObservationCard observation={selectedObservation} />
+            ) : hasSubmissionQuery && isLive ? (
+              <p>
+                Submitted observation not found or unavailable. It may be hidden,
+                moderated, or not yet stored.
+              </p>
+            ) : (
+              <>
+                <p>Current preview: live submission is not enabled yet.</p>
+                <p>
+                  After Phase 0.1 submission is enabled, your submitted anonymized
+                  observation will appear here after confirmation.
+                </p>
+                <div className="submission-flow" aria-label="Future submission flow">
+                  <span>report.html</span>
+                  <span>preview anonymized summary</span>
+                  <span>submit</span>
+                  <span>return here</span>
+                </div>
+              </>
+            )}
           </div>
         </section>
 
@@ -891,12 +1092,12 @@ function AgentInjectionLabEvidencePage() {
             <p>Static sample data shown until live submissions are enabled.</p>
           </div>
           <div className="stat-grid">
-            {primaryEvidenceStats.map((stat) => (
+            {primaryStats.map((stat) => (
               <EvidenceStatCard key={stat.label} stat={stat} />
             ))}
           </div>
           <div className="stat-grid stat-grid-secondary">
-            {secondaryEvidenceStats.map((stat) => (
+            {secondaryStats.map((stat) => (
               <EvidenceStatCard key={stat.label} stat={stat} />
             ))}
           </div>
@@ -908,12 +1109,16 @@ function AgentInjectionLabEvidencePage() {
             <h2>Sample anonymized observations</h2>
           </div>
           <div className="observation-grid">
-            {sampleObservations.map((observation, index) => (
-              <ObservationCard
-                key={`${observation.result}-${index}`}
-                observation={observation}
-              />
-            ))}
+            {displayedObservations.length > 0 ? (
+              displayedObservations.map((observation, index) => (
+                <ObservationCard
+                  key={`${observation.result}-${index}`}
+                  observation={observation}
+                />
+              ))
+            ) : (
+              <p>No visible live observations yet.</p>
+            )}
           </div>
         </section>
 
