@@ -18,6 +18,8 @@ This is a public preview site. Phase 0.1 live submissions are enabled through a 
 
 If the API or D1 binding is unavailable, the Evidence Gallery uses sample anonymized observations as a fallback. No full evidence upload is accepted.
 
+Release snapshot: [docs/phase-0-1-release-snapshot.md](./docs/phase-0-1-release-snapshot.md)
+
 ## Not Implemented Yet
 
 - upload flow
