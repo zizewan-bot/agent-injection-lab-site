@@ -22,7 +22,9 @@ Output directory:
 dist
 ```
 
-Cloudflare Pages SPA fallback is provided by `public/_redirects`. Vite copies this file to `dist/_redirects` during build so direct refreshes on nested React routes resolve to `index.html`.
+For Cloudflare Pages pure static mode, a `_redirects` file can be used for SPA fallback.
+
+For Wrangler deploy / Workers static assets, use `wrangler.jsonc` with `assets.not_found_handling` set to `single-page-application` and do not use `_redirects`.
 
 ## Current Deployment Status
 
