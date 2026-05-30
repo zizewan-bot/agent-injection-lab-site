@@ -8,7 +8,7 @@ Phase 0.1 — Opt-in Anonymous Result Submission
 
 Planning / PRD only. Do not implement code from this document until the Phase 0.1 implementation task is explicitly approved.
 
-Implementation note: Batch A site-side backend foundation is implemented in the Personal Landing Page repository. Live submission still requires Cloudflare D1 database setup, replacing the `TODO_D1_DATABASE_ID` placeholder, applying the D1 migration, and deploying the Worker.
+Implementation note: Batch A site-side backend foundation is implemented in the Personal Landing Page repository. The Cloudflare D1 database is configured, the initial migration has been applied, and the Worker deployment supports live Phase 0.1 submissions.
 
 ## Summary
 
@@ -547,7 +547,7 @@ Add page copy equivalent to:
 
 The public gallery never displays full reports, events, source code, Git diffs, prompts, absolute paths, real secrets, emails, IP addresses, or full run folders."
 
-Until live Phase 0.1 submissions launch, the public Evidence Gallery must state that it uses static sample anonymized observations.
+If live Phase 0.1 submissions cannot be loaded, the public Evidence Gallery must state that it is using static sample anonymized observations as a fallback.
 
 ## Gallery Aggregation Logic
 

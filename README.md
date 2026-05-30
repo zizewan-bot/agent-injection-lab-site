@@ -9,14 +9,14 @@ This repository contains the static public preview website that supports transpa
 - Agent Injection Lab project page
 - Local test guide
 - Scenario Catalog
-- Static Evidence Gallery preview
+- Live Evidence Gallery with static fallback
 - Phase 0.1 PRD
 
 ## Current Preview Status
 
-This is a public preview site. Phase 0.1 backend code is present, but live submissions require Cloudflare D1 setup before they are active.
+This is a public preview site. Phase 0.1 live submissions are enabled through a Cloudflare Worker API and D1-backed storage for sanitized observations.
 
-Until the `DB` D1 binding is configured and deployed, the Evidence Gallery uses sample anonymized observations as a fallback. No full evidence upload is accepted.
+If the API or D1 binding is unavailable, the Evidence Gallery uses sample anonymized observations as a fallback. No full evidence upload is accepted.
 
 ## Not Implemented Yet
 
@@ -34,7 +34,7 @@ The repository includes:
 - `GET /api/agent-injection-lab/observations/:submission_id`
 - D1 migration for sanitized observations
 
-Live submission is only active after the D1 database is created, the `database_id` placeholder in `wrangler.jsonc` is replaced, and the migration is applied. The gallery only reads sanitized visible observations.
+Live submission is active after the D1 database migration has been applied and the Worker is deployed. The gallery only reads sanitized visible observations.
 
 ## Related Repository
 

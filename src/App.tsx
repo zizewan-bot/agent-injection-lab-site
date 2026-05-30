@@ -353,8 +353,8 @@ function AgentInjectionLabPage() {
             ))}
           </div>
           <p className="private-note">
-            The CLI source code is available in public preview. Live result
-            submission and gallery automation are not implemented yet.
+            The CLI source code is available in public preview. Phase 0.1
+            opt-in result submission and live gallery aggregation are enabled.
           </p>
         </section>
 
@@ -1058,7 +1058,9 @@ function AgentInjectionLabEvidencePage() {
 
         <section className="section submitted-observation-section">
           <div className="submitted-observation-card">
-            <p className="eyebrow">Phase 0.1 placeholder</p>
+            <p className="eyebrow">
+              {selectedObservation ? "Submission received" : "Phase 0.1 live"}
+            </p>
             <h2>Your submitted observation</h2>
             {selectedObservation ? (
               <ObservationCard observation={selectedObservation} />
@@ -1069,10 +1071,9 @@ function AgentInjectionLabEvidencePage() {
               </p>
             ) : (
               <>
-                <p>Current preview: live submission is not enabled yet.</p>
                 <p>
-                  After Phase 0.1 submission is enabled, your submitted anonymized
-                  observation will appear here after confirmation.
+                  Submit an anonymized result from a local report.html to see
+                  your observation here.
                 </p>
                 <div className="submission-flow" aria-label="Future submission flow">
                   <span>report.html</span>
@@ -1087,9 +1088,15 @@ function AgentInjectionLabEvidencePage() {
 
         <section className="section evidence-stats-section">
           <div className="section-heading">
-            <p className="eyebrow">Sample aggregate view</p>
-            <h2>Phase 0 observation snapshot</h2>
-            <p>Static sample data shown until live submissions are enabled.</p>
+            <p className="eyebrow">
+              {isLive ? "Live aggregate view" : "Static sample view"}
+            </p>
+            <h2>{isLive ? "Live observation snapshot" : "Sample observation snapshot"}</h2>
+            <p>
+              {isLive
+                ? "Showing sanitized observations accepted by the Phase 0.1 submission API."
+                : "Static sample data shown because live submissions could not be loaded."}
+            </p>
           </div>
           <div className="stat-grid">
             {primaryStats.map((stat) => (
@@ -1106,7 +1113,11 @@ function AgentInjectionLabEvidencePage() {
         <section className="section evidence-observations-section">
           <div className="section-heading">
             <p className="eyebrow">Latest observations</p>
-            <h2>Sample anonymized observations</h2>
+            <h2>
+              {isLive
+                ? "Latest anonymized observations"
+                : "Sample anonymized observations"}
+            </h2>
           </div>
           <div className="observation-grid">
             {displayedObservations.length > 0 ? (
@@ -1151,9 +1162,8 @@ function AgentInjectionLabEvidencePage() {
             </p>
             <p>
               The CLI source code is public preview under AGPL-3.0. This site
-              code is being prepared for public preview. Submission endpoints,
-              validator source, live gallery aggregation, and storage are not
-              implemented yet.
+              code is public preview. Live submission endpoint, validator logic,
+              and D1-backed gallery aggregation are implemented for Phase 0.1.
             </p>
           </div>
           <div className="transparency-grid">
@@ -1164,15 +1174,19 @@ function AgentInjectionLabEvidencePage() {
                 <li>report-side anonymization logic</li>
                 <li>local report generation logic</li>
                 <li>anonymized summary format</li>
+                <li>submission endpoint source</li>
+                <li>validator logic</li>
+                <li>D1-backed gallery aggregation logic</li>
+                <li>sanitized observation storage format</li>
               </ul>
             </article>
             <article>
-              <h3>Coming in Phase 0.1</h3>
+              <h3>Phase 0.1 live</h3>
               <ul className="check-list">
-                <li>submission endpoint source</li>
-                <li>validator logic</li>
-                <li>live gallery aggregation logic</li>
-                <li>sanitized observation storage format</li>
+                <li>opt-in submission API</li>
+                <li>strict schema validation</li>
+                <li>visible-observation aggregation</li>
+                <li>submission-linked gallery view</li>
               </ul>
             </article>
             <article>

@@ -38,17 +38,16 @@ If Cloudflare deployment still fails with stale asset behavior, use "Clear build
 
 ## Current Deployment Status
 
-Not deployed yet.
+Deployed as a public preview through Cloudflare Workers Static Assets.
 
 ## Phase 0.1 Backend Status
 
-Backend foundation is present, but live submission requires Cloudflare D1 setup before it is active.
+Phase 0.1 live submission is active after Cloudflare D1 setup, migration application, and Worker deployment.
 
-Required setup:
+Production setup:
 
-1. Create the D1 database named `agent_injection_lab_observations`.
-2. Replace `TODO_D1_DATABASE_ID` in `wrangler.jsonc` with the real D1 database id.
-3. Apply `migrations/0001_create_observations.sql`.
-4. Deploy with Wrangler after build and migration verification.
+1. D1 database `agent_injection_lab_observations` is bound as `DB`.
+2. Apply any new migrations before deploying Worker changes that depend on them.
+3. Deploy with Wrangler after build, test, and migration verification.
 
 The Evidence Gallery falls back to sample anonymized observations when the API or D1 binding is unavailable. No full evidence upload is accepted. Gallery data reads only sanitized observations where `moderation_status` is `visible`.
