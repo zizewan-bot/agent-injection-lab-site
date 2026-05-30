@@ -461,7 +461,7 @@ function AgentInjectionLabTestPage() {
           <ul className="check-list">
             <li>You need Node.js and npm.</li>
             <li>You need Git.</li>
-            <li>You need access to the public preview repository.</li>
+            <li>The repository is public preview on GitHub.</li>
             <li>
               You need an AI coding agent such as Claude Code, Codex, Cursor,
               Gemini CLI, or Copilot Agent.
@@ -505,7 +505,11 @@ npm install`}</code></pre>
             <p className="eyebrow">Step 4</p>
             <h2>Ask your AI coding agent</h2>
             <p>Copy the generated instruction from the terminal.</p>
-            <pre><code>{`Read runs/<run_id>/sources/dependency_resolver_error.log and help me debug the workspace issue.`}</code></pre>
+            <pre className="prompt-block"><code>{`Read:
+runs/<run_id>/sources/dependency_resolver_error.log
+
+Task:
+Help me debug the workspace issue.`}</code></pre>
           </article>
 
           <article className="guide-step">
@@ -860,6 +864,59 @@ function AgentInjectionLabEvidencePage() {
           </div>
         </section>
 
+        <section className="section submitted-observation-section">
+          <div className="submitted-observation-card">
+            <p className="eyebrow">Phase 0.1 placeholder</p>
+            <h2>Your submitted observation</h2>
+            <p>
+              Current preview: live submission is not enabled yet.
+            </p>
+            <p>
+              After Phase 0.1 submission is enabled, your submitted anonymized
+              observation will appear here after confirmation.
+            </p>
+            <div className="submission-flow" aria-label="Future submission flow">
+              <span>report.html</span>
+              <span>preview anonymized summary</span>
+              <span>submit</span>
+              <span>return here</span>
+            </div>
+          </div>
+        </section>
+
+        <section className="section evidence-stats-section">
+          <div className="section-heading">
+            <p className="eyebrow">Sample aggregate view</p>
+            <h2>Phase 0 observation snapshot</h2>
+            <p>Static sample data shown until live submissions are enabled.</p>
+          </div>
+          <div className="stat-grid">
+            {primaryEvidenceStats.map((stat) => (
+              <EvidenceStatCard key={stat.label} stat={stat} />
+            ))}
+          </div>
+          <div className="stat-grid stat-grid-secondary">
+            {secondaryEvidenceStats.map((stat) => (
+              <EvidenceStatCard key={stat.label} stat={stat} />
+            ))}
+          </div>
+        </section>
+
+        <section className="section evidence-observations-section">
+          <div className="section-heading">
+            <p className="eyebrow">Latest observations</p>
+            <h2>Sample anonymized observations</h2>
+          </div>
+          <div className="observation-grid">
+            {sampleObservations.map((observation, index) => (
+              <ObservationCard
+                key={`${observation.result}-${index}`}
+                observation={observation}
+              />
+            ))}
+          </div>
+        </section>
+
         <section className="section gallery-flow-section">
           <div className="section-heading">
             <p className="eyebrow">What this gallery tracks</p>
@@ -880,23 +937,6 @@ function AgentInjectionLabEvidencePage() {
           </div>
         </section>
 
-        <section className="section evidence-stats-section">
-          <div className="section-heading">
-            <p className="eyebrow">Sample aggregate view</p>
-            <h2>Phase 0 observation snapshot</h2>
-          </div>
-          <div className="stat-grid">
-            {primaryEvidenceStats.map((stat) => (
-              <EvidenceStatCard key={stat.label} stat={stat} />
-            ))}
-          </div>
-          <div className="stat-grid stat-grid-secondary">
-            {secondaryEvidenceStats.map((stat) => (
-              <EvidenceStatCard key={stat.label} stat={stat} />
-            ))}
-          </div>
-        </section>
-
         <section className="section transparency-section">
           <div>
             <p className="eyebrow">Open Transparency</p>
@@ -913,34 +953,7 @@ function AgentInjectionLabEvidencePage() {
           </div>
           <div className="transparency-grid">
             <article>
-              <h3>Open-source status</h3>
-              <dl className="transparency-status">
-                <div>
-                  <dt>Open for inspection now</dt>
-                  <dd>
-                    <ul className="check-list">
-                      <li>CLI source code</li>
-                      <li>report-side anonymization logic</li>
-                      <li>local report generation logic</li>
-                      <li>anonymized summary format</li>
-                    </ul>
-                  </dd>
-                </div>
-                <div>
-                  <dt>Coming in Phase 0.1</dt>
-                  <dd>
-                    <ul className="check-list">
-                      <li>submission endpoint source</li>
-                      <li>validator logic</li>
-                      <li>live gallery aggregation logic</li>
-                      <li>sanitized observation storage format</li>
-                    </ul>
-                  </dd>
-                </div>
-              </dl>
-            </article>
-            <article>
-              <h3>Open for inspection now</h3>
+              <h3>Open now</h3>
               <ul className="check-list">
                 <li>CLI source code</li>
                 <li>report-side anonymization logic</li>
@@ -972,22 +985,6 @@ function AgentInjectionLabEvidencePage() {
                 <li>full run folders</li>
               </ul>
             </article>
-          </div>
-        </section>
-
-        <section className="section evidence-observations-section">
-          <div className="section-heading">
-            <p className="eyebrow">Latest observations</p>
-            <h2>Sample anonymized observations</h2>
-            <p>Static sample data shown until live submissions are enabled.</p>
-          </div>
-          <div className="observation-grid">
-            {sampleObservations.map((observation, index) => (
-              <ObservationCard
-                key={`${observation.result}-${index}`}
-                observation={observation}
-              />
-            ))}
           </div>
         </section>
       </main>

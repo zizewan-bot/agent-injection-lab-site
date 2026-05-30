@@ -351,6 +351,10 @@ pre {
   line-height: 1.6;
 }
 
+.prompt-block {
+  white-space: pre-wrap;
+}
+
 code {
   font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
   font-size: 0.92rem;
@@ -405,16 +409,18 @@ code {
   gap: 22px;
 }
 
-.source-flow {
+.source-flow,
+.submission-flow {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 12px;
   counter-reset: flow-step;
 }
 
-.source-flow span {
+.source-flow span,
+.submission-flow span {
   position: relative;
-  min-height: 96px;
+  min-height: 84px;
   display: grid;
   align-content: center;
   padding: 18px 18px 18px 48px;
@@ -427,7 +433,8 @@ code {
   box-shadow: 0 14px 36px rgba(31, 41, 51, 0.06);
 }
 
-.source-flow span::before {
+.source-flow span::before,
+.submission-flow span::before {
   counter-increment: flow-step;
   content: counter(flow-step);
   position: absolute;
@@ -442,6 +449,39 @@ code {
   color: #ffffff;
   font-size: 0.78rem;
   transform: translateY(-50%);
+}
+
+.submitted-observation-section {
+  padding-top: 56px;
+}
+
+.submitted-observation-card {
+  display: grid;
+  gap: 18px;
+  padding: 28px;
+  border: 1px solid #9fb9ac;
+  border-left: 6px solid #1d4f3f;
+  border-radius: 8px;
+  background: #ffffff;
+  box-shadow: 0 18px 50px rgba(31, 41, 51, 0.08);
+}
+
+.submitted-observation-card h2 {
+  margin-bottom: 0;
+}
+
+.submitted-observation-card p {
+  max-width: 780px;
+  margin: 0;
+}
+
+.submission-flow {
+  margin-top: 6px;
+}
+
+.submission-flow span {
+  min-height: 70px;
+  box-shadow: none;
 }
 
 .scenario-section {
@@ -733,7 +773,7 @@ code {
 .transparency-section {
   display: grid;
   grid-template-columns: minmax(0, 0.72fr) minmax(0, 1fr);
-  gap: 48px;
+  gap: 32px;
   align-items: start;
 }
 
@@ -744,11 +784,15 @@ code {
 }
 
 .transparency-grid article {
-  padding: 22px;
+  padding: 18px;
   border: 1px solid #c9d7cf;
   border-radius: 8px;
   background: #ffffff;
-  box-shadow: 0 14px 36px rgba(31, 41, 51, 0.06);
+  box-shadow: none;
+}
+
+.transparency-grid h3 {
+  font-size: 1.05rem;
 }
 
 .transparency-status {
@@ -802,6 +846,7 @@ code {
   .guide-step,
   .project-card,
   .source-flow,
+  .submission-flow,
   .scenario-grid-three,
   .scenario-meta,
   .stat-grid,
