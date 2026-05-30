@@ -22,6 +22,8 @@ Output directory:
 dist
 ```
 
+Cloudflare Pages SPA fallback is provided by `public/_redirects`. Vite copies this file to `dist/_redirects` during build so direct refreshes on nested React routes resolve to `index.html`.
+
 ## Current Deployment Status
 
 Not deployed yet.
