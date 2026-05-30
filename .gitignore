@@ -1,0 +1,12 @@
+node_modules/
+dist/
+.DS_Store
+*.local
+*.log
+logs/
+tmp/
+temp/
+cache/
+.cache/
+.env
+.env.*
